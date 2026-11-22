@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>투자 계산기</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"Malgun Gothic",sans-serif;background:#0f1419;color:#e6edf3;padding:24px 16px}
+.wrap{max-width:560px;margin:0 auto}
+h1{font-size:26px;margin:0 0 4px}
+.sub{color:#8b98a5;font-size:14px;margin-bottom:20px}
+.card{background:#1a222c;border-radius:14px;padding:18px;margin-bottom:16px}
+label{display:block;font-size:13px;color:#8b98a5;margin:12px 0 6px}
+label:first-child{margin-top:0}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #2d3a48;background:#0f1419;color:#e6edf3;font-size:16px}
+input:focus{outline:none;border-color:#4da3ff}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.item{background:#0f1419;border-radius:10px;padding:12px}
+.item span{display:block;font-size:12px;color:#8b98a5;margin-bottom:4px}
+.item b{font-size:17px}
+.big{grid-column:1/3;background:#12324f}
+.big b{font-size:24px;color:#4da3ff}
+.up{color:#ff6b6b}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid #2d3a48}
+th{color:#8b98a5;font-weight:600}
+th:first-child,td:first-child{text-align:left}
+.note{font-size:12px;color:#8b98a5;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>투자 계산기</h1>
+<div class="sub">복리 + 월 적립 기준으로 미래 자산을 계산해 보세요.</div>
+<div class="card">
+<label>초기 투자금 (원)</label><input id="p" type="number" value="10000000" inputmode="numeric">
+<label>월 적립금 (원)</label><input id="m" type="number" value="500000" inputmode="numeric">
+<label>연 수익률 (%)</label><input id="r" type="number" value="7" step="0.1" inputmode="decimal">
+<label>투자 기간 (년)</label><input id="y" type="number" value="10" inputmode="numeric">
+</div>
+<div class="card">
+<div class="res">
+<div class="item big"><span>최종 금액</span><b id="fv">-</b></div>
+<div class="item"><span>총 원금</span><b id="pr">-</b></div>
+<div class="item"><span>수익금</span><b id="pf" class="up">-</b></div>
+<div class="item"><span>총 수익률</span><b id="rt" class="up">-</b></div>
+<div class="item"><span>월 평균 수익</span><b id="mo">-</b></div>
+</div>
+</div>
+<div class="card">
+<table><thead><tr><th>연차</th><th>원금</th><th>평가금액</th></tr></thead><tbody id="tb"></tbody></table>
+<div class="note">월 복리(연 수익률을 월 환산), 매월 말 적립 가정. 세금·수수료는 반영하지 않았으며, 실제 수익을 보장하지 않습니다.</div>
+</div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)};
+var won=function(n){return Math.round(n).toLocaleString("ko-KR")+"원"};
+function calc(){
+var p=+$("p").value||0,m=+$("m").value||0,r=(+$("r").value||0)/100,y=Math.max(0,Math.floor(+$("y").value||0));
+var rm=Math.pow(1+r,1/12)-1,bal=p,rows="";
+for(var i=1;i<=y*12;i++){bal=bal*(1+rm)+m;
+if(i%12===0){rows+="<tr><td>"+(i/12)+"년</td><td>"+won(p+m*i)+"</td><td>"+won(bal)+"</td></tr>"}}
+var pr=p+m*y*12,pf=bal-pr;
+$("fv").textContent=won(bal);$("pr").textContent=won(pr);$("pf").textContent=won(pf);
+$("rt").textContent=pr>0?(pf/pr*100).toFixed(1)+"%":"-";
+$("mo").textContent=y>0?won(pf/(y*12)):"-";
+$("tb").innerHTML=rows;}
+["p","m","r","y"].forEach(function(i){$(i).addEventListener("input",calc)});
+calc();
+</script>
+</body>
+</html>
